@@ -5,7 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/main.js",
-    "dev": "ts-node src/main.ts",
+    "dev": "ts-node-dev --respawn src/main.ts --host",
+    "dev:simples": "ts-node src/simple.ts",
     "build": "tsc"
   },
   "keywords": [],
@@ -13,11 +14,16 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^4.19.2"
+    "axios": "^1.7.2",
+    "express": "^4.19.2",
+    "fast-xml-parser": "^4.4.0",
+    "soap": "^1.0.4",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/node": "^20.14.9",
+    "@types/xml2js": "^0.4.14",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.5.2"
