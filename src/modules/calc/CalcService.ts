@@ -1,102 +1,61 @@
-/* import { MathExpression } from './CalcModel';
-import { Request, Response } from 'express'; */
-//import axios from "axios";
-import { parseStringPromise } from "xml2js";
-//import * as soup from 'soap'
-//import * as fs from "fs";
-/* import { soapRequest } from './soap'
-
-import * as parser from 'fast-xml-parser';
-
-const parserEx = new parser.XMLParser(); */
-
-//const parser = new DOMParser();
+import { parseStringPromise } from 'xml2js';
+import soapRequest from 'easy-soap-request';
 
 export class CalcService {
-    private apiUrl = "http://www.dneonline.com/calculator.asmx?wsdl";
+  private apiUrl = "http://www.dneonline.com/calculator.asmx";
 
-    /* async add(a: number, b: number): Promise<number> {
-      const headers = {
-        "Content-Type": "text/xml; charset=utf-8",
-        SOAPAction: "http://tempuri.org/Add",
-      };
-  
-      const xmlRequest = `
-                      <?xml version="1.0" encoding="utf-8"?>
-                      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-                          <soap:Body>
-                              <Add xmlns="http://tempuri.org/">
-                                  <intA>${a}</intA>
-                                  <intB>${b}</intB>
-                              </Add>
-                          </soap:Body>
-                      </soap:Envelope>
-                  `;
-  
-      console.log(xmlRequest);
-  
-      try {
-        console.log("1");
-        const response = await axios.post(this.apiUrl, xmlRequest, { headers });
-        console.log(response.data);
-        const result = await parseStringPromise(response.data, {
-          explicitArray: false,
-        });
-        const addResult = result['soap:Envelope']['soap:Body']['AddResponse']['AddResult'];
-  
-        return parseFloat(addResult);
-      } catch (error) {
-        console.error("Error calling Add method:", error);
-        throw new Error("Failed to call Add method");
-      }
-    } */
-
-    async add(a: number, b: number) {
-        const addUrl = './src/modules/calc/XML/add.xml'
-
-        const headers = {
-            "Content-Type": "text/xml; charset=utf-8",
-            SOAPAction: "http://tempuri.org/Add",
-        };
-
-        const xmlRequestRaw = `
-        <?xml version="1.0" encoding="utf-8"?>
-        <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  async add(intA: number, intB: number) {
+    const sampleHeaders = {
+      'user-agent': 'sampleTest',
+      'Content-Type': 'text/xml;charset=UTF-8',
+      soapAction: 'http://tempuri.org/Add',
+    };
+    const soapEnvelope = `
+          <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
             <soap:Body>
-                <Add xmlns="http://tempuri.org/">
-                    <intA>${a}</intA>
-                    <intB>${b}</intB>
-                </Add>
+              <Add xmlns="http://tempuri.org/">
+                <intA>${intA}</intA>
+                <intB>${intB}</intB>
+              </Add>
             </soap:Body>
-        </soap:Envelope>`;
+          </soap:Envelope>
+        `;
+        
+    const { response } = await soapRequest({ url: this.apiUrl, headers: sampleHeaders, xml: soapEnvelope });
 
-        const xmlRequestFormated = parseStringPromise(xmlRequestRaw);
+    const { body } = response;
+    const parsed = await parseStringPromise(body);
+    const result = parsed['soap:Envelope']['soap:Body'][0]['AddResponse'][0]['AddResult'][0];
+    const formatedResult = parseFloat(result)
 
-        console.log(xmlRequestFormated)
+    return formatedResult;
+  }
 
-        /* const xml = fs.readFileSync(addUrl, 'utf-8');
+  async subtract(intA: number, intB: number) {
+    const sampleHeaders = {
+      'user-agent': 'sampleTest',
+      'Content-Type': 'text/xml;charset=UTF-8',
+      soapAction: 'http://tempuri.org/Subtract',
+    };
+    const soapEnvelope = `
+          <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+            <soap:Body>
+              <Subtract xmlns="http://tempuri.org/">
+                <intA>${intA}</intA>
+                <intB>${intB}</intB>
+              </Subtract>
+            </soap:Body>
+          </soap:Envelope>
+        `;
 
-        const modifiedXML = xml
-            .replace('<intA>intAA</intA>', `<intA>${a}</intA>`)
-            .replace('<intB>intBB</intB>', `<intB>${b}</intB>`);
+    const { response } = await soapRequest({ url: this.apiUrl, headers: sampleHeaders, xml: soapEnvelope });
 
-        fs.writeFile(addUrl, modifiedXML, 'utf-8', (err) => {
-            if (err) {
-                console.error('Erro ao escrever no arquivo:', err);
-                return;
-            }
-            console.log('Arquivo XML modificado com sucesso!');
-        }); */
+    const { body } = response;
+    const parsed = await parseStringPromise(body);
 
-       /*  try {
-            const { response } = await soapRequest(this.apiUrl, headers, xml); // Optional timeout parameter(milliseconds)
-            const { body } = response;
-            const parsedResponse = parserEx.parse(body); // parse body xml
-            const addResult = parsedResponse['soap:Envelope']['soap:Body']['AddResponse']['AddResult'];
-            return addResult
-        } catch (err: any) {
-            console.error(err);
-        } */
+    const result = parsed['soap:Envelope']['soap:Body'][0]['SubtractResponse'][0]['SubtractResult'][0];
+    const formatedResult = parseFloat(result)
 
-    }
+    return formatedResult;
+  }
 }
